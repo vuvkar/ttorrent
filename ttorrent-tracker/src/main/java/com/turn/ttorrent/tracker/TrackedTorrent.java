@@ -215,6 +215,9 @@ public class TrackedTorrent implements TorrentHash {
     } else if (RequestEvent.NONE.equals(event)) {
       peer = this.getPeer(peerUID);
       state = TrackedPeer.PeerState.STARTED;
+    } else if (RequestEvent.CHANGED.equals(event)) {
+      peer = this.getPeer(peerUID);
+      state = TrackedPeer.PeerState.COMPLETED;
     } else {
       throw new IllegalArgumentException("Unexpected announce event type!");
     }

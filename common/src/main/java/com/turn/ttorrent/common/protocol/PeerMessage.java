@@ -61,7 +61,8 @@ public abstract class PeerMessage {
     BITFIELD(5),
     REQUEST(6),
     PIECE(7),
-    CANCEL(8);
+    CANCEL(8),
+    NEW_DATA(9);
 
     private byte id;
 
@@ -182,6 +183,8 @@ public abstract class PeerMessage {
         return PieceMessage.parse(buffer.slice(), torrent);
       case CANCEL:
         return CancelMessage.parse(buffer.slice(), torrent);
+      case NEW_DATA:
+        return NewDataMessage.parse(buffer.slice(), torrent);
       default:
         throw new IllegalStateException("Message type should have " +
                 "been properly defined by now.");
@@ -682,6 +685,77 @@ public abstract class PeerMessage {
       buffer.putInt(offset);
       buffer.putInt(length);
       return new CancelMessage(buffer, piece, offset, length);
+    }
+
+    public String toString() {
+      return super.toString() + " #" + this.getPiece() +
+              " (" + this.getLength() + "@" + this.getOffset() + ")";
+    }
+  }
+
+  /**
+   * New Data message.
+   *
+   * <len=00013><id=8><piece index><block offset><block length>
+   */
+  public static class NewDataMessage extends PeerMessage {
+
+    private static final int BASE_SIZE = 13;
+
+    private int piece;
+    private int offset;
+    private int length;
+
+    private NewDataMessage(ByteBuffer buffer, int piece,
+                          int offset, int length) {
+      super(Type.NEW_DATA, buffer);
+      this.piece = piece;
+      this.offset = offset;
+      this.length = length;
+    }
+
+    public int getPiece() {
+      return this.piece;
+    }
+
+    public int getOffset() {
+      return this.offset;
+    }
+
+    public int getLength() {
+      return this.length;
+    }
+
+    @Override
+    public NewDataMessage validate(TorrentInfo torrent)
+            throws MessageValidationException {
+      if (this.piece >= 0 && this.piece < torrent.getPieceCount() &&
+              this.offset + this.length <=
+                      torrent.getPieceSize(this.piece)) {
+        return this;
+      }
+
+      throw new MessageValidationException(this);
+    }
+
+    public static NewDataMessage parse(ByteBuffer buffer,
+                                      TorrentInfo torrent) throws MessageValidationException {
+      int piece = buffer.getInt();
+      int offset = buffer.getInt();
+      int length = buffer.getInt();
+      return new NewDataMessage(buffer, piece,
+              offset, length).validate(torrent);
+    }
+
+    public static NewDataMessage craft(int piece, int offset, int length) {
+      ByteBuffer buffer = ByteBuffer.allocate(
+              MESSAGE_LENGTH_FIELD_SIZE + CancelMessage.BASE_SIZE);
+      buffer.putInt(CancelMessage.BASE_SIZE);
+      buffer.put(PeerMessage.Type.CANCEL.getTypeByte());
+      buffer.putInt(piece);
+      buffer.putInt(offset);
+      buffer.putInt(length);
+      return new NewDataMessage(buffer, piece, offset, length);
     }
 
     public String toString() {

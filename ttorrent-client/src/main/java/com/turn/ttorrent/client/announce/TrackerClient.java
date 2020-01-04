@@ -170,9 +170,12 @@ public abstract class TrackerClient {
               message.getType().name() + "!");
     }
 
-
     AnnounceResponseMessage response =
             (AnnounceResponseMessage) message;
+
+    if (hexInfoHash.getBytes().length == 40) {
+      this.fireTorrentFileChangedEvent(hexInfoHash);
+    }
 
     this.fireAnnounceResponseEvent(
             response.getComplete(),
@@ -187,6 +190,7 @@ public abstract class TrackerClient {
     this.fireDiscoveredPeersEvent(
             response.getPeers(),
             hexInfoHash);
+
   }
 
   /**
@@ -199,6 +203,12 @@ public abstract class TrackerClient {
   protected void fireAnnounceResponseEvent(int complete, int incomplete, int interval, String hexInfoHash) {
     for (AnnounceResponseListener listener : this.listeners) {
       listener.handleAnnounceResponse(interval, complete, incomplete, hexInfoHash);
+    }
+  }
+
+  protected void fireTorrentFileChangedEvent (String hexInfoHash) {
+    for (AnnounceResponseListener listener : this.listeners) {
+      listener.handleTorrentChanging(hexInfoHash);
     }
   }
 

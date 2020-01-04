@@ -9,6 +9,8 @@ public interface TorrentListener {
    */
   void peerConnected(PeerInformation peerInformation);
 
+  void resetDownloadedData() throws InterruptedException;
+
   /**
    * Invoked when connection with peer is closed.
    *

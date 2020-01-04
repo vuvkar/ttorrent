@@ -43,6 +43,8 @@ public interface PeerActivityListener extends EventListener {
    */
   void handlePeerChoked(SharingPeer peer);
 
+  void handleResetData ();
+
   /**
    * Peer ready handler.
    *

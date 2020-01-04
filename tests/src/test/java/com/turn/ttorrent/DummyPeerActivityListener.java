@@ -16,6 +16,11 @@ public class DummyPeerActivityListener implements PeerActivityListener {
   }
 
   @Override
+  public void handleResetData () {
+
+  }
+
+  @Override
   public void handlePeerReady(SharingPeer peer) {
 
   }

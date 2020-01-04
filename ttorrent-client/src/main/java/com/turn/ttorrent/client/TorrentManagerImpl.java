@@ -45,6 +45,11 @@ class TorrentManagerImpl implements TorrentManager {
       public void downloadComplete() {
         semaphore.release();
       }
+
+      @Override
+      public void resetDownloadedData () throws InterruptedException {
+        semaphore.acquire();
+      }
     };
     try {
       addListener(listener);

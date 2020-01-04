@@ -456,6 +456,11 @@ public class SharedTorrent implements PeerActivityListener, TorrentMetadata, Tor
             });
   }
 
+  @Override
+  public void handleResetData () {
+
+  }
+
   /**
    * Peer ready handler.
    * <p/>

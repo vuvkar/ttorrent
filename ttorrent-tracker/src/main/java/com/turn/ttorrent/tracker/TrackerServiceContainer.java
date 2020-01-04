@@ -48,6 +48,7 @@ public class TrackerServiceContainer implements Container {
    */
   @Override
   public void handle(Request request, final Response response) {
+    //// Server gets request
     // Reject non-announce requests
     if (!Tracker.ANNOUNCE_URL.equals(request.getPath().toString())) {
       response.setCode(404);

@@ -76,6 +76,11 @@ public class SimpleClient {
               public void downloadComplete() {
                 semaphore.release();
               }
+
+              @Override
+              public void resetDownloadedData () throws InterruptedException {
+                semaphore.acquire();
+              }
             }
     );
     TorrentManager torrentManager = communicationManager.addTorrent(torrentFile, downloadDir, listeners);

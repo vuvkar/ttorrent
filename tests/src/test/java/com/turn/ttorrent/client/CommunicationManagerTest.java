@@ -135,6 +135,11 @@ public class CommunicationManagerTest {
       public void downloadComplete() {
         semaphore.release();
       }
+
+      @Override
+      public void resetDownloadedData () {
+        semaphore.acquire();
+      }
     };
     try {
       torrentManager.addListener(listener);
@@ -1145,6 +1150,12 @@ public class CommunicationManagerTest {
       public void pieceDownloaded(PieceInformation pieceInformation, PeerInformation peerInformation) {
         totalDownloaded.addAndGet(pieceInformation.getSize());
         pieceLoadedInvocationCount.incrementAndGet();
+      }
+
+      @Override
+      public void resetDownloadedData () {
+        totalDownloaded.set(0);
+        pieceLoadedInvocationCount.set(0);
       }
 
       @Override

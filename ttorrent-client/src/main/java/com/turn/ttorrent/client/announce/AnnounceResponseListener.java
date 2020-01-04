@@ -44,4 +44,7 @@ public interface AnnounceResponseListener extends EventListener {
    *              any other means like DHT/PEX, etc.).
    */
   void handleDiscoveredPeers(List<Peer> peers, String hexInfoHash);
+
+
+  void handleTorrentChanging (String hexInfoHash);
 }

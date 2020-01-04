@@ -230,6 +230,37 @@ public class CommunicationManager implements AnnounceResponseListener, PeerActiv
     return new TorrentManagerImpl(eventDispatcher, loadedTorrent.getTorrentHash());
   }
 
+  public void changeFile (TorrentMetadataProvider metadataProvider,
+                          PieceStorage pieceStorage,
+                          List<TorrentListener> listeners) throws IOException {
+    TorrentMetadata torrentMetadata = metadataProvider.getTorrentMetadata();
+    EventDispatcher eventDispatcher = new EventDispatcher();
+    for (TorrentListener listener : listeners) {
+      eventDispatcher.addListener(listener);
+    }
+    final LoadedTorrentImpl loadedTorrent = new LoadedTorrentImpl(
+            new TorrentStatistic(),
+            metadataProvider,
+            torrentMetadata,
+            pieceStorage,
+            eventDispatcher);
+
+    if (pieceStorage.isFinished()) {
+      loadedTorrent.getTorrentStatistic().setLeft(0);
+    } else {
+      long left = calculateLeft(pieceStorage, torrentMetadata);
+      loadedTorrent.getTorrentStatistic().setLeft(left);
+    }
+    eventDispatcher.multicaster().validationComplete(pieceStorage.getAvailablePieces().cardinality(), torrentMetadata.getPiecesCount());
+
+    this.torrentsStorage.remove()
+
+    this.torrentsStorage.addTorrent(loadedTorrent.getTorrentHash().getHexInfoHash(), loadedTorrent);
+    forceAnnounceAndLogError(loadedTorrent, CHANGED);
+
+    return new TorrentManagerImpl(eventDispatcher, loadedTorrent.getTorrentHash());
+  }
+
   private long calculateLeft(PieceStorage pieceStorage, TorrentMetadata torrentMetadata) {
 
     long size = 0;
@@ -681,6 +712,11 @@ public class CommunicationManager implements AnnounceResponseListener, PeerActiv
 
   @Override
   public void handlePeerChoked(SharingPeer peer) { /* Do nothing */ }
+
+  @Override
+  public void handleResetData () {
+
+  }
 
   @Override
   public void handlePeerReady(SharingPeer peer) { /* Do nothing */ }

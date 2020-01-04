@@ -8,6 +8,11 @@ public class TorrentListenerWrapper implements TorrentListener {
   }
 
   @Override
+  public void resetDownloadedData () throws InterruptedException {
+
+  }
+
+  @Override
   public void peerDisconnected(PeerInformation peerInformation) {
 
   }

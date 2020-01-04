@@ -23,6 +23,13 @@ public class EventDispatcher {
       }
 
       @Override
+      public void resetDownloadedData () throws InterruptedException {
+        for (TorrentListener listener : listeners) {
+          listener.resetDownloadedData();
+        }
+      }
+
+      @Override
       public void peerDisconnected(PeerInformation peerInformation) {
         for (TorrentListener listener : listeners) {
           listener.peerDisconnected(peerInformation);
